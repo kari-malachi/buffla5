@@ -12,6 +12,8 @@ import (
 	i18n "github.com/gobuffalo/mw-i18n"
 	"github.com/gobuffalo/packr/v2"
 	"github.com/kari-malachi/buffla5/models"
+
+	"time"
 )
 
 // ENV is used to help switch settings based on where the
@@ -60,6 +62,12 @@ func App() *buffalo.App {
 
 		app.GET("/", HomeHandler)
 
+		app.Use(func (next buffalo.Handler) buffalo.Handler {
+					return func(c buffalo.Context) error {
+						c.Set("year", time.Now().Year())
+						return next(c)
+					}
+				})
 		app.ServeFiles("/", assetsBox) // serve files from the public directory
 	}
 
