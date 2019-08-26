@@ -1,13 +1,16 @@
 package models
 
 import (
+	"crypto/sha1"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/gobuffalo/pop"
 	"github.com/gobuffalo/validate"
 	"github.com/gobuffalo/validate/validators"
 	"github.com/gofrs/uuid"
+	"github.com/pkg/errors"
 )
 
 type Link struct {
@@ -32,6 +35,26 @@ type Links []Link
 func (l Links) String() string {
 	jl, _ := json.Marshal(l)
 	return string(jl)
+}
+
+func (l *Link) BeforeValidations(tx *pop.Connection) error {
+	if l.Code != "" {
+		return nil
+	}
+	h := sha1.New()
+	h.Write(l.UserID.Bytes())
+	h.Write([]byte(l.Link))
+	h.Write([]byte(time.Now().String()))
+	code := fmt.Sprintf("%x", h.Sum(nil))[:7]
+	exists, err := tx.Where("code = ?", code).Exists("links")
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	if exists {
+		return l.BeforeValidations(tx)
+	}
+	l.Code = code
+	return nil
 }
 
 // Validate gets run every time you call a "pop.Validate*" (pop.ValidateAndSave, pop.ValidateAndCreate, pop.ValidateAndUpdate) method.
