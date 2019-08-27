@@ -1,7 +1,18 @@
-package models
+package models_test
 
-import "testing"
+import (
+	"github.com/gobuffalo/uuid"
+	"github.com/kari-malachi/buffla5/models"
+)
 
-func Test_Link(t *testing.T) {
-	t.Fatal("This test needs to be implemented!")
+func (ms *ModelSuite) Test_Link_BeforeValidations() {
+	uid, _ := uuid.NewV4()
+	link := &models.Link{
+		UserID: uid,
+		Link:   "http://gobuffalo.io",
+	}
+	err := link.BeforeValidations(ms.DB)
+	ms.NoError(err)
+	ms.NotZero(link.Code)
+	ms.Len(link.Code, 7)
 }
