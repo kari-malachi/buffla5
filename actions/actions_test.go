@@ -45,6 +45,8 @@ func (as *ActionSuite) CreateLink(user *models.User) *models.Link {
 		Code:   "12345",
 		UserID: user.ID,
 	}
-	as.NoError(as.DB.Create(link))
+	verrs, err := as.DB.ValidateAndCreate(link)
+	as.NoError(err)
+	as.False(verrs.HasAny())
 	return link
 }
