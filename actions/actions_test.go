@@ -38,3 +38,13 @@ func (as *ActionSuite) Login() *models.User {
 	as.Session.Set("current_user_id", user.ID)
 	return user
 }
+
+func (as *ActionSuite) CreateLink(user *models.User) *models.Link {
+	link := &models.Link{
+		Link:   "www.vimeo.com",
+		Code:   "12345",
+		UserID: user.ID,
+	}
+	as.NoError(as.DB.Create(link))
+	return link
+}
