@@ -5,6 +5,7 @@ import (
 
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gobuffalo/suite"
+	"github.com/kari-malachi/buffla5/models"
 )
 
 type ActionSuite struct {
@@ -21,4 +22,19 @@ func Test_ActionSuite(t *testing.T) {
 		Action: action,
 	}
 	suite.Run(t, as)
+}
+
+func (as *ActionSuite) CreateUser() *models.User {
+	user := &models.User{
+		Name:  "Kari",
+		Email: "kari@ma.com",
+	}
+	as.NoError(as.DB.Create(user))
+	return user
+}
+
+func (as *ActionSuite) Login() *models.User {
+	user := as.CreateUser()
+	as.Session.Set("current_user_id", user.ID)
+	return user
 }

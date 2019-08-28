@@ -3,12 +3,9 @@ package actions
 import "github.com/kari-malachi/buffla5/models"
 
 func (as *ActionSuite) Test_LinksResource_List() {
-	user := &models.User{
-		Name:  "Kari",
-		Email: "kari@ma.com",
-	}
-	as.NoError(as.DB.Create(user))
-	as.Session.Set("current_user_id", user.ID)
+
+	user := as.Login()
+
 	link := &models.Link{
 		Link:   "www.vimeo.com",
 		Code:   "12345",
